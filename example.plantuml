@@ -1,0 +1,15 @@
+@startuml Example
+    DescriptorScriptPubKeyMan <|-- ScriptPubKeyMan
+    class ScriptPubKeyMan {
+        boost::signals2::signalx< void bool fHaveWatchOnly> 	NotifyWatchonlyChanged
+        boost::signals2::signal< void> 	NotifyCanGetAddressesChanged
+        +seeds List
+        +pending_seed Seed
+        +pending_mnemonic List
+    }
+    class DescriptorScriptPubKeyMan {
+        -map<CKeyID, pair<CPubKey, vector<unsigned char>>> CryptedKeyMap
+        -int32_t 	m_max_cached_index = -1
+        -bool 	m_decryption_thoroughly_checked
+    }
+@enduml

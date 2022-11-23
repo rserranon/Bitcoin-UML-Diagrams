@@ -1,0 +1,48 @@
+@startuml Example
+    class RPCHelpMan
+    class RPCResult
+class RPCHelpMan{
+    +RPCHelpMan(string name, string description, vector<RPCArg> args, RPCResults results, RPCExamples examples)
+    +UniValue HandleRequest(const JSONRPCRequest& request)
+    +string ToString()
+    +UniValue GetArgMap()
+    +bool IsValidNumArgs(size_t num_args)
+    +vector<std::string> GetArgNames()
+    +string m_name;
+}
+class RPCResult {
+    +Type m_type
+    +string m_key_name
+    +vector<RPCResult> m_inner
+    +bool m_optional;
+    +bool m_skip_type_check;
+    +string m_description;
+}    
+class RPCResults {
+    +vector<RPCResult> m_results
+    +std::string ToDescriptionString()
+}    
+class RPCExamples {
+    +std::string m_examples
+    +RPCExamples(string examples)
+}
+class RPCArg {
+    +GetFirstName()
+    +GetName()
+    +IsOptional()
+    +ToDescriptionString()
+    +ToString()
+    +ToStringObject()
+    +string m_names
+    +Type m_type
+    +bool m_hidden
+    +vector<RPCArg> m_inner
+    +Fallback m_fallback
+    +string m_description
+    +string m_oneline_description
+    +vector<string> m_type_str
+}
+RPCResults o-- RPCResult
+RPCResult  o-- RPCResult
+RPCArg     o-- RPCArg
+@enduml
