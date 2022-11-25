@@ -1,0 +1,63 @@
+
+@startuml wallet
+    Chain <|-- ChainImpl
+    ScriptPubKeyMan <|-- DescriptorScriptPubkeyMan
+    ScriptPubKeyMan <|-- LegacyScriptPubkeyMan 
+    SigningProvider <|-- FillableSigningProvider
+    SigningProvider <|-- LegacySigningProvider
+    FillableSigningProvider <|-  LegacyScriptPubkeyMan 
+    WalletStorage <|-- CWallet
+    interface interfaces::Chain::Notifications
+    interfaces::Chain::Notifications <|-- CWallet
+    Descriptor <|-- DescriptorImpl
+    DescriptorImpl <|-- AddressDescriptor 
+    DescriptorImpl <|-- RawDescriptor
+    DescriptorImpl <|-- PKDescriptor
+    DescriptorImpl <|-- PKHDescriptor
+    DescriptorImpl <|-- WPKHDescriptor
+    DescriptorImpl <|-- ComboDescriptor 
+    DescriptorImpl <|-- MultisigDescriptor
+    class CWallet {
+        -CKeyingMaterial vMasterKey
+        -int nWalletVersion
+        -atomic<int64_t> m_best_block_time
+        -TxSpends mapTxSpends
+        -interfaces::Chain* m_chain
+        -string m_name
+        -unique_ptr<WalletDatabase> m_database
+        -atomic<int64_t> m_best_block_time
+        -map<OutputType, ScriptPubKeyMan*> m_external_spk_managers
+        -map<OutputType, ScriptPubKeyMan*> m_internal_spk_managers
+        -map<uint256, std::unique_ptr<ScriptPubKeyMan>> m_spk_managers
+        +std::map<CTxDestination, CAddressBookData> m_address_book
+        -uint256 m_last_block_processed
+    }
+    note left of CWallet::vMasterKey  
+        typedef vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial
+    end note    
+    note left of CWallet::mapTxSpends 
+        typedef unordered_multimap<COutPoint, uint256, SaltedOutpointHasher> TxSpends
+    end note    
+
+    class ScriptPubKeyMan {
+        #WalletStorage& m_storage
+    }
+    class DescriptorScriptPubkeyMan {
+        +map<CScript, int32_t>    m_map_script_pub_keys
+        +map<CPubKey, int32_t>    m_map_pubkeys
+        +map<CKeyID, CKey>        m_map_keys
+        +map<CKeyID, pair<CPubKey, vector<unsigned char>>> m_map_crypted_keys
+        +map<int32_t, FlatSigningProvider> m_map_signing_providers
+        #WalletDescriptor         m_wallet_descriptor
+    }
+    class WalletDescriptor {
+        +shared_ptr<Descriptor> descriptor
+    }
+    Chain -o CWallet::m_chain
+    CWallet::m_external_spk_managers o- ScriptPubKeyMan
+    CWallet::m_internal_spk_managers o- ScriptPubKeyMan
+    CWallet::m_spk_managers o- ScriptPubKeyMan
+    Descriptor -o WalletDescriptor::descriptor
+    WalletDescriptor::descriptor -o DescriptorScriptPubkeyMan::m_wallet_descriptor
+
+@enduml
