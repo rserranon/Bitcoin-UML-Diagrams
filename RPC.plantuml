@@ -1,4 +1,4 @@
-@startuml Example
+@startuml RPC
     class RPCHelpMan
     class RPCResult
 class RPCHelpMan{
@@ -8,7 +8,12 @@ class RPCHelpMan{
     +UniValue GetArgMap()
     +bool IsValidNumArgs(size_t num_args)
     +vector<std::string> GetArgNames()
-    +string m_name;
+    +string m_name
+    #RPCMethodImpl m_fun
+    #string m_description
+    #RPCResults m_results
+    #vector<RPCArg> m_args
+    #RPCExamples m_examples
 }
 class RPCResult {
     +Type m_type
@@ -42,7 +47,14 @@ class RPCArg {
     +string m_oneline_description
     +vector<string> m_type_str
 }
-RPCResults o-- RPCResult
-RPCResult  o-- RPCResult
+RPCResult -o RPCResults::m_results
+RPCResult --o RPCResult
 RPCArg     o-- RPCArg
+RPCHelpMan::m_examples o-- RPCExamples
+JSONRPCRequest -o RPCHelpMan::m_fun
+RPCHelpMan::m_args o--  RPCArg
+RPCResults --o RPCHelpMan::m_results
+note left of RPCHelpMan::m_fun
+    RPCMethodImpl = function<UniValue(const RPCHelpMan&, const JSONRPCRequest&)>
+end note    
 @enduml
